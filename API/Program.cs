@@ -1,3 +1,4 @@
+using API.Middleware;
 using Core.Interfaces;
 using Infrastracture.Data;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,7 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<StoreContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+builder.Services.AddCors();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 //builder.Services.AddOpenApi();
@@ -23,8 +25,9 @@ if (app.Environment.IsDevelopment())
 }
 
 //app.UseHttpsRedirection();
-
-app.UseAuthorization();
+app.UseMiddleware<ExceptionMiddleware>();
+app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+//app.UseAuthorization();
 
 app.MapControllers();
 
